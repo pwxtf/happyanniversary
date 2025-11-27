@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>𝖋𝖔𝖚𝖗 𝖒𝖔𝖓𝖙</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Courier New',monospace;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:#fff;
+overflow:hidden;
+background:black;
+}
+
+/* VIDEO BG */
+video{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+object-fit:cover;
+z-index:-1;
+filter:brightness(30%);
+}
+
+/* LOGIN */
+#login{
+position:absolute;
+text-align:center;
+}
+
+input{
+padding:12px;
+background:black;
+border:2px solid hotpink;
+color:hotpink;
+outline:none;
+font-size:18px;
+text-align:center;
+letter-spacing:2px;
+}
+
+button{
+margin-top:12px;
+padding:10px 25px;
+background:black;
+border:1px solid hotpink;
+color:hotpink;
+cursor:pointer;
+transition:.3s;
+}
+
+button:hover{
+background:hotpink;
+color:black;
+}
+
+/* CONTENT */
+#content{
+display:none;
+width:85%;
+max-width:900px;
+text-align:center;
+animation:fadeIn 2s;
+position:relative;
+top:-6%;
+}
+
+/* TEXT STYLE AESTHETIC */
+.textbox{
+font-size:20px;
+line-height:1.9;
+letter-spacing:.5px;
+color:white;
+text-shadow:0 0 10px rgba(255,105,180,.5);
+animation:neonPulse 3.5s infinite alternate;
+}
+
+/* NEXT */
+#next{
+margin-top:28px;
+display:none;
+font-size:16px;
+}
+
+@keyframes fadeIn{
+from{opacity:0; transform:scale(.96)}
+to{opacity:1; transform:scale(1)}
+}
+
+@keyframes neonPulse{
+from{ text-shadow:0 0 8px hotpink; }
+to{ text-shadow:0 0 20px deeppink; }
+}
+
+/* ===== MUSIC PLAYER UI (LEFT SIDE) ===== */
+#musicPlayer{
+  position:fixed;
+  top:15px;
+  left:15px;
+  display:flex;
+  align-items:center;
+  z-index:9999;
+  gap:10px; /* tambah jarak antara star dan controls */
+}
+
+#star{
+  font-size:26px;
+  cursor:pointer;
+  color:hotpink;
+  text-shadow:0 0 10px hotpink;
+  transition:.3s;
+}
+
+#star:hover{
+  transform:scale(1.2);
+}
+
+#controls{
+  display:none;
+  background:rgba(0,0,0,.6);
+  border:1px solid hotpink;
+  border-radius:20px;
+  padding:6px 10px;
+}
+
+#controls button{
+  background:none;
+  border:none;
+  color:hotpink;
+  font-size:16px;
+  margin:0 6px;
+  cursor:pointer;
+}
+
+#controls button:hover{
+  color:white;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MUSIC PLAYER -->
+<div id="musicPlayer">
+  <div id="star" onclick="togglePlayer()">𖤐</div>
+  <div id="controls">
+    <button onclick="prevSong()">◃◃</button>
+    <button onclick="togglePlay()">ⅠⅠ</button>
+    <button onclick="nextSong()">▹▹</button>
+    <button onclick="toggleLoop()">↻</button>
+  </div>
+</div>
+
+<audio id="audio"></audio>
+<!-- END MUSIC PLAYER -->
+
+<video autoplay muted loop>
+<source src="xyz.mp4" type="video/mp4">
+</video>
+
+<div id="login">
+<h2 class="textbox">𝐄𝐍𝐓𝐄𝐑 𝐏𝐀𝐒𝐒𝐖𝐎𝐑𝐃 !!</h2><br>
+<input id="pw" type="password" placeholder="𝖔𝖚𝖗 𝖜𝖊𝖉𝖉𝖎𝖓𝖌 𝖉𝖆𝖙𝖊">
+<br>
+<button onclick="check()">𝖚𝖓𝖑𝖔𝖈𝖐</button>
+</div>
+
+<div id="content">
+<div id="text" class="textbox"></div>
+<button id="next" onclick="nextText()">几乇乂ㄒ</button>
+</div>
+
+<script>
+const password="27-07-2025";
+
+const p=[
+
+`𝐇𝐀𝐏𝐏𝐘 𝐀𝐍𝐍𝐈𝐕𝐄𝐑𝐒𝐀𝐑𝐘 𝟒 𝐌𝐎𝐍𝐓𝐇 𝐒𝐀𝐘𝐀𝐀𝐀𝐀𝐀𝐀𝐍𝐆
+𝐄𝐌𝐏𝐀𝐓 𝐁𝐔𝐋𝐀𝐍 𝐁𝐔𝐊𝐀𝐍 𝐖𝐀𝐊𝐓𝐔 𝐘𝐀𝐍𝐆 𝐋𝐀𝐌𝐀𝐀𝐀.
+𝐓𝐀𝐏𝐈 𝐁𝐔𝐀𝐓 𝐌𝐀𝐒.. 𝐈𝐍𝐈 𝐂𝐔𝐊𝐔𝐏 𝐁𝐔𝐀𝐓 𝐍𝐆𝐄𝐑𝐀𝐒𝐀𝐀 𝐁𝐀𝐇𝐖𝐀𝐀𝐀𝐀 𝐃𝐄𝐃𝐄𝐄𝐄𝐄 𝐈𝐓𝐔 𝐁𝐄𝐑𝐀𝐑𝐓𝐈 𝐁𝐀𝐍𝐆𝐄𝐓 <3`,
+
+`𝐌𝐀𝐒 𝐍𝐃𝐀𝐀𝐀 𝐍𝐘𝐀𝐍𝐆𝐊𝐀𝐀𝐀 𝐁𝐈𝐒𝐀𝐀𝐀 𝐒𝐄𝐃𝐄𝐊𝐄𝐓 𝐈𝐍𝐈 𝐒𝐀𝐌𝐀 𝐃𝐄𝐃𝐄𝐄𝐄𝐄
+𝐁𝐈𝐒𝐀𝐀𝐀 𝐍𝐆𝐄𝐑𝐀𝐒𝐀𝐀 𝐓𝐄𝐍𝐀𝐍𝐆 𝐂𝐔𝐌𝐀  𝐃𝐀𝐑𝐈  𝐒𝐀𝐓𝐔𝐔𝐔  𝐇𝐀𝐃𝐈𝐑
+𝐁𝐈𝐒𝐀 𝐒𝐄𝐍𝐀𝐍𝐆  𝐂𝐔𝐌𝐀 𝐊𝐀𝐑𝐄𝐍𝐀𝐀𝐀𝐀𝐀𝐀𝐀𝐀  𝐏𝐄𝐒𝐀𝐍  𝐒𝐈𝐍𝐆𝐊𝐀𝐓  𝐃𝐀𝐑𝐈  𝐃𝐄𝐃𝐄𝐄𝐄𝐄𝐄𝐄𝐄𝐄𝐄𝐄.`,
+
+`𝐃𝐀𝐑𝐈  𝐇𝐀𝐑𝐈  𝐊𝐄  𝐇𝐀𝐑𝐈
+𝐌𝐀𝐒  𝐌𝐔𝐋𝐀𝐈  𝐍𝐄𝐌𝐔  𝐁𝐀𝐍𝐘𝐀𝐀𝐀𝐀  𝐇𝐀𝐋  𝐊𝐄𝐂𝐈𝐋
+𝐘𝐀𝐍𝐆  𝐁𝐈𝐊𝐈𝐍  𝐌𝐀𝐒  𝐌𝐀𝐊𝐈𝐍  𝐒𝐀𝐘𝐀𝐀𝐀𝐀𝐀𝐀𝐍𝐆  𝐒𝐀𝐌𝐀  𝐃𝐄𝐃𝐄𝐄𝐄𝐄𝐄.`,
+
+`𝐂𝐀𝐑𝐀𝐀𝐀𝐀  𝐃𝐄𝐃𝐄𝐄𝐄  𝐊𝐄𝐓𝐀𝐖𝐀𝐀𝐀..
+𝐂𝐀𝐑𝐀  𝐃𝐄𝐃𝐄𝐄𝐄  𝐂𝐄𝐑𝐈𝐓𝐀𝐀𝐀𝐀,
+𝐁𝐀𝐇𝐊𝐀𝐍  𝐂𝐀𝐑𝐀𝐀𝐀  𝐃𝐄𝐃𝐄𝐄𝐄  𝐏𝐔𝐍𝐃𝐔𝐍𝐆  𝐏𝐔𝐍..
+𝐒𝐄𝐊𝐀𝐑𝐀𝐍𝐆  𝐒𝐄𝐌𝐔𝐀𝐍𝐘𝐀𝐀𝐀𝐀  𝐉𝐀𝐃𝐈  𝐁𝐀𝐆𝐈𝐀𝐍  𝐃𝐀𝐑𝐈  𝐇𝐀𝐑𝐈  𝐌𝐀𝐒  𝐀𝐊𝐒𝐉𝐒𝐊𝐊𝐒𝐉𝐒𝐊𝐒𝐊𝐒𝐉...🫶🥰🤍`,
+
+`𝐄𝐌𝐏𝐀𝐓  𝐁𝐔𝐋𝐀𝐍  𝐈𝐍𝐈  𝐌𝐔𝐍𝐆𝐊𝐈𝐍  𝐁𝐀𝐑𝐔  𝐀𝐖𝐀𝐋
+𝐌𝐀𝐒  𝐓𝐀𝐔  𝐍𝐃𝐀𝐀𝐀  𝐒𝐄𝐌𝐔𝐀𝐀𝐀  𝐍𝐀𝐍𝐓𝐈  𝐁𝐀𝐊𝐀𝐋  𝐒𝐄𝐋𝐀𝐋𝐔𝐔𝐔  𝐌𝐔𝐃𝐀𝐇
+𝐏𝐀𝐒𝐓𝐈  𝐀𝐃𝐀𝐀𝐀  𝐂𝐀𝐏𝐄𝐄𝐄  𝐄𝐆𝐄𝐎𝐎𝐎𝐎𝐎𝐎𝐎𝐎𝐎  𝐃𝐀𝐍  𝐒𝐀𝐋𝐀𝐇  𝐏𝐀𝐇𝐀𝐌.`,
+
+`𝐓𝐀𝐏𝐈  𝐒𝐀𝐓𝐔𝐔𝐔  𝐇𝐀𝐋   𝐘𝐀𝐍𝐆  𝐌𝐀𝐒  𝐘𝐀𝐊𝐈𝐍
+𝐇𝐀𝐓𝐈  𝐌𝐀𝐒  𝐁𝐔𝐀𝐓  𝐃𝐄𝐃𝐄𝐄𝐄  𝐍𝐃𝐀𝐀𝐀  𝐏𝐄𝐑𝐍𝐀𝐀𝐀  𝐁𝐄𝐑𝐔𝐁𝐀𝐇
+𝐍𝐃𝐀𝐀𝐀   𝐏𝐄𝐑𝐍𝐀𝐀𝐀   𝐑𝐀𝐆𝐔𝐔𝐔𝐔
+𝐃𝐀𝐍  𝐍𝐃𝐀𝐀𝐀𝐀𝐀   𝐏𝐄𝐑𝐍𝐀𝐀𝐀𝐀𝐀𝐀𝐀   𝐒𝐄𝐓𝐄𝐍𝐆𝐀𝐇².`,
+
+`𝐌𝐀𝐒  𝐂𝐔𝐌𝐀  𝐁𝐄𝐑𝐇𝐀𝐑𝐏..
+𝐃𝐄𝐃𝐄𝐄𝐄  𝐍𝐃𝐀𝐀𝐀  𝐂𝐔𝐌𝐀𝐀𝐀𝐀𝐀𝐀𝐀𝐀𝐀𝐀   𝐉𝐀𝐃𝐈   𝐒𝐈𝐍𝐆𝐆𝐀𝐇
+𝐓𝐀𝐏𝐈  𝐉𝐀𝐃𝐈   𝐑𝐔𝐌𝐀𝐇   𝐅𝐎𝐑𝐄𝐕𝐄𝐑.. 🥹🤍`,
+
+`𝐌𝐀𝐀𝐀𝐀𝐀𝐀𝐀𝐀𝐂𝐘   𝐔𝐃𝐀𝐀𝐀𝐀𝐀   𝐍𝐄𝐑𝐈𝐌𝐀𝐀𝐀   𝐌𝐀𝐒
+𝐃𝐄𝐍𝐆𝐀𝐍   𝐒𝐄𝐌𝐔𝐀𝐀𝐀𝐀𝐀   𝐊𝐄𝐊𝐔𝐑𝐀𝐍𝐆𝐀𝐍   𝐌𝐀𝐒.`,
+
+`𝐃𝐀𝐍  𝐒𝐄𝐋𝐀𝐌𝐀𝐀𝐀𝐀   𝐃𝐄𝐃𝐄𝐄𝐄   𝐌𝐀𝐒𝐈𝐇   𝐃𝐈   𝐒𝐈𝐍𝐈
+𝐌𝐀𝐒   𝐉𝐔𝐆𝐀𝐀𝐀𝐀   𝐀𝐊𝐀𝐍   𝐓𝐄𝐓𝐀𝐏   𝐃𝐈   𝐒𝐈𝐍𝐈 🫶🤍`
+
+];
+
+let i=0;
+
+function check(){
+if(document.getElementById("pw").value===password){
+document.getElementById("login").style.display="none";
+document.getElementById("content").style.display="block";
+show();
+audio.play(); 
+}else{
+alert("𝐖𝐑𝐎𝐍𝐆 𝐏𝐀𝐒𝐒𝐖𝐎𝐑𝐃 𝐁𝐀𝐁𝐘 🤍");
+}
+}
+
+function show(){
+const el=document.getElementById("text");
+el.innerHTML="";
+let c=0;
+
+let typing=setInterval(()=>{
+if(c<p[i].length){
+el.innerHTML += p[i][c];
+c++;
+}else{
+clearInterval(typing);
+document.getElementById("next").style.display="inline-block";
+}
+},25);
+}
+
+function nextText(){
+i++;
+if(i<p.length){
+document.getElementById("next").style.display="none";
+document.getElementById("text").innerHTML="";
+show();
+}else{
+document.getElementById("next").style.display="none";
+}
+}
+
+/* ===== MUSIC SYSTEM ===== */
+const songs = [
+ "lovely.mp3",
+ "lovely2.mp3",
+ "lovely3.mp3",
+ "lovely4.mp3"
+];
+
+let index=0;
+let looping=false;
+const audio=document.getElementById("audio");
+
+audio.src=songs[0];
+
+function togglePlayer(){
+let c=document.getElementById("controls");
+c.style.display=(c.style.display=="flex")?"none":"flex";
+}
+
+function togglePlay(){
+if(audio.paused){audio.play();}else{audio.pause();}
+}
+
+function nextSong(){
+index++;
+if(index>=songs.length) index=0;
+audio.src=songs[index];
+audio.play();
+}
+
+function prevSong(){
+index--;
+if(index<0) index=songs.length-1;
+audio.src=songs[index];
+audio.play();
+}
+
+function toggleLoop(){
+looping=!looping;
+audio.loop=looping;
+}
+
+audio.onended=function(){
+if(!audio.loop){ nextSong(); }
+};
+</script>
+
+</body>
+                                      </html>
